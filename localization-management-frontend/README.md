@@ -8,7 +8,7 @@ Run the development server:
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the demo. For running the backend, follow the instructions in the README inside of the localization-management-api directory. Test scripts can be run with source .venv/bin/activate && python3 test_performance.py Front-end tests can be run with npm test.
+Open [http://localhost:3000](http://localhost:3000) to view the demo. For running the backend, follow the instructions in the README inside of the localization-management-api directory. Create an .env file with SUPABASE_URL and SUPABASE_KEY variables specific to your Supabase database. Test scripts can be run with source .venv/bin/activate && python3 test_performance.py Front-end tests can be run with npm test.
 
 ##Approach
 I tackled this by approaching the state management via Zustand, and then applying TanStack (React Query) Query for searching and filtering results. I used Zod for schema creation and validation. I used lucide-react for icons, and built the components using Tailwind and the styles that were inside of the repository. 
