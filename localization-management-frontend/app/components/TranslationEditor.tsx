@@ -3,19 +3,21 @@ import useStore from '../store/translationStore';
 import { TranslationSchema } from '../schemas/translationSchema';
 import { z } from 'zod';
 import Button from './Button';
+import { useUpdateTranslationMutation } from '../queries-and-mutations/translationMutations';
 
-interface InlineTranslationEditorProps {
+interface TranslationEditorProps {
     translationId: string;
     locale: string;
     currentValue: string;
 }
 
-export default function InlineTranslationEditor({ 
+export default function TranslationEditor({ 
     translationId, 
     locale, 
     currentValue 
-}: InlineTranslationEditorProps) {
-    const { updateTranslation, closeEditor, isLoading, error } = useStore();
+}: TranslationEditorProps) {
+    const { closeEditor } = useStore();
+    const updateMutation = useUpdateTranslationMutation();
     
     const [editValue, setEditValue] = useState(currentValue);
     const [validationError, setValidationError] = useState<string | null>(null);
@@ -49,8 +51,17 @@ export default function InlineTranslationEditor({
 
     const handleSave = async () => {
         if (validateInput(editValue)) {
-                await updateTranslation(translationId, locale, editValue);
+            try {
+                await updateMutation.mutateAsync({
+                    id: translationId,
+                    locale,
+                    data: { value: editValue }
+                });
                 closeEditor();
+            } catch (error) {
+                console.error('Failed to save translation:', error);
+                // Error is already handled by the mutation's onError
+            }
         }
     };
 
@@ -68,6 +79,9 @@ export default function InlineTranslationEditor({
             handleCancel();
         }
     };
+
+    const isLoading = updateMutation.isPending;
+    const error = updateMutation.error?.message;
 
     return (
         <div className="bg-blue-50 dark:bg-stone-700 p-3 rounded border border-blue-200 dark:border-stone-600">
@@ -98,6 +112,7 @@ export default function InlineTranslationEditor({
                     variant="secondary"
                     size="sm"
                     text="Cancel"
+                    disabled={isLoading}
                 />
                 <Button
                     onClick={handleSave}
