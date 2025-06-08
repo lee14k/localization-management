@@ -60,7 +60,7 @@ export default function TranslationEditor({
                 closeEditor();
             } catch (error) {
                 console.error('Failed to save translation:', error);
-                // Error is already handled by the mutation's onError
+                // Error is already handled by the mutation's onError, left this here due to time constraints and for manual debugging I was doing.
             }
         }
     };

@@ -15,7 +15,6 @@ export default function TranslationKeyManager() {
     getSearchFilters 
   } = useStore();
 
-  // Get search filters from store
   const searchFilters = getSearchFilters();
   
   const { 
@@ -24,8 +23,7 @@ export default function TranslationKeyManager() {
     error 
   } = useTranslationSearchQuery(searchFilters);
 
-  // Custom hook for highlighting with performance optimization
-  const highlightText = useTextHighlighter(searchFilters.query);
+const highlightText = useTextHighlighter(searchFilters.query);
 
   if (isLoading) {
     return (
@@ -132,7 +130,11 @@ export default function TranslationKeyManager() {
                 <div className="mt-3">
                   {hasTranslations ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {Object.entries(item.translations).map(([locale, translation]) => {
+                      {Object.entries(item.translations)
+                        .filter(([locale]) => {
+                          return !searchFilters.locale || locale === searchFilters.locale;
+                        })
+                        .map(([locale, translation]) => {
                         const isCurrentlyEditing = isEditing(item.id, locale);
                         
                         return (
@@ -173,9 +175,9 @@ export default function TranslationKeyManager() {
                         </h3>
                       </div>
                       <p className="text-sm text-orange-700 dark:text-orange-300 mb-3">
-                        This translation key '<strong>
+                        This translation key <strong>
                           {highlightText(item.key)}
-                        </strong>' has not been translated into any language yet. 
+                        </strong> has not been translated into any language yet. 
                       </p>
                     </div>
                   )}

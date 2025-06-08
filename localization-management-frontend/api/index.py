@@ -14,11 +14,11 @@ supabase: Client = create_client(supabase_url, supabase_key)
 app = FastAPI()
 
 
-@app.get("/localizations/{project_id}/{locale}")
+@app.get("/api/localizations/{project_id}/{locale}")
 async def get_localizations(project_id: str, locale: str):
     return {"project_id": project_id, "locale": locale, "localizations": {"greeting": "Hello", "farewell": "Goodbye"}}
 
-@app.get("/localizations/")
+@app.get("/api/localizations")
 async def get_all_localizations():
     return supabase.table("localizations").select("*").execute()
 
@@ -35,11 +35,11 @@ async def get_localizations_by_project_ids(project_ids: str):
     result = supabase.table("localizations").select("*").in_("project_id", project_id_list).execute()
     return result
 
-
+# Pydantic models for request/response
 class LocalizationUpdate(BaseModel):
     project_id: str
     locale: str
-    localizations: dict
+    localizations: dict  # JSON object containing key-value pairs
 
 class BulkUpdateRequest(BaseModel):
     updates: List[LocalizationUpdate]
@@ -57,10 +57,12 @@ async def bulk_update_localizations(request: BulkUpdateRequest):
         
         for update in request.updates:
             try:
+                # Direct update assuming the record exists
                 result = supabase.table("localizations").update({
                     "localizations": update.localizations
                 }).eq("project_id", update.project_id).eq("locale", update.locale).execute()
                 
+                # Check if update was successful
                 if hasattr(result, 'data') and result.data is not None:
                     if len(result.data) > 0:
                         updated_count += 1

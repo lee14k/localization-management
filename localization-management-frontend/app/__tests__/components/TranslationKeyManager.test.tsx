@@ -416,4 +416,70 @@ describe('TranslationKeyManager Component', () => {
       expect(screen.getByText('button.save')).toBeDefined()
     })
   })
+
+  describe('Locale Filtering', () => {
+    beforeEach(() => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ;(mockUseTranslationSearchQuery as any).mockReturnValue({
+        ...mockTranslationQuery,
+        data: mockTranslationData,
+      })
+      mockIsKeyExpanded.mockReturnValue(true) // Expand to show translations
+    })
+
+    // Test that when a locale is filtered, only translations for that locale are shown
+    it('shows only translations for selected locale when locale filter is active', () => {
+      mockGetSearchFilters.mockReturnValue({ locale: 'en' })
+      
+      render(<TranslationKeyManager />)
+      
+      // Should show English translation
+      expect(screen.getByText('Save')).toBeDefined()
+      expect(screen.getByText('en')).toBeDefined()
+      
+      // Should NOT show Spanish translation
+      expect(screen.queryByText('Guardar')).toBeNull()
+      expect(screen.queryByText('es')).toBeNull()
+    })
+
+    // Test that when a different locale is filtered, only that locale's translations are shown
+    it('shows only translations for Spanish when es locale is filtered', () => {
+      mockGetSearchFilters.mockReturnValue({ locale: 'es' })
+      
+      render(<TranslationKeyManager />)
+      
+      // Should show Spanish translation
+      expect(screen.getByText('Guardar')).toBeDefined()
+      expect(screen.getByText('es')).toBeDefined()
+      
+      // Should NOT show English translation
+      expect(screen.queryByText('Save')).toBeNull()
+      expect(screen.queryByText('en')).toBeNull()
+    })
+
+    // Test that when no locale is filtered, all translations are shown
+    it('shows all translations when no locale filter is active', () => {
+      mockGetSearchFilters.mockReturnValue({}) // No filters
+      
+      render(<TranslationKeyManager />)
+      
+      // Should show both English and Spanish translations
+      expect(screen.getByText('Save')).toBeDefined()
+      expect(screen.getByText('Guardar')).toBeDefined()
+      expect(screen.getByText('en')).toBeDefined()
+      expect(screen.getByText('es')).toBeDefined()
+    })
+
+    // Test that locale filtering works correctly with keys that have no translations
+    it('handles locale filtering correctly for keys with no translations', () => {
+      mockGetSearchFilters.mockReturnValue({ locale: 'en' })
+      
+      render(<TranslationKeyManager />)
+      
+      // Should still show the key without translations and the appropriate message
+      const formEmailElements = screen.getAllByText('form.email')
+      expect(formEmailElements.length).toBeGreaterThan(0)
+      expect(screen.getByText('No Translations Available')).toBeDefined()
+    })
+  })
 }) 
