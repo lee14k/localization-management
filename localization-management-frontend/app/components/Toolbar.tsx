@@ -91,7 +91,7 @@ export default function Toolbar() {
             <span className="text-stone-600 dark:text-stone-400">Active filters:</span>
             {searchQuery && (
               <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
-                Search: '{searchQuery}'
+                Search: {searchQuery}
               </span>
             )}
             {selectedCategory && (
